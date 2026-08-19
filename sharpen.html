@@ -91,6 +91,14 @@
   nav.sidebar .sub-list li{ margin:0; }
   nav.sidebar .sub-list a{ display:block; font-size:12.5px; color:var(--text-muted); text-decoration:none; padding:4px 10px; }
   nav.sidebar .sub-list a:hover{ color:var(--accent); }
+  /* A "group" item (React Syntax, TypeScript Syntax, Error Handling, ...) is a
+     subsection heading, not a leaf link like "— Component" below it - same
+     flat <ul> for simplicity, but needs to actually look like a heading
+     instead of just another muted link at the same size/weight. */
+  nav.sidebar .sub-list li.group{ margin-top:12px; }
+  nav.sidebar .sub-list li.group:first-child{ margin-top:0; }
+  nav.sidebar .sub-list li.group > a{ font-size:13px; font-weight:700; color:var(--text); padding:4px 10px 4px 6px; }
+  nav.sidebar .sub-list li.group > a:hover{ color:var(--accent); }
 
   main{ flex:1; min-width:0; max-width:820px; margin:0; padding:8px 32px 80px; }
   section{ padding-top:38px; }
@@ -166,7 +174,7 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
 
     <a class="top-link" href="#documentation">Documentation</a>
     <ul class="sub-list">
-      <li><a href="#doc-react">React Syntax</a></li>
+      <li class="group"><a href="#doc-react">React Syntax</a></li>
       <li><a href="#doc-component">— Component</a></li>
       <li><a href="#doc-state-prop">— State &amp; Props</a></li>
       <li><a href="#doc-markup">— Conditionals &amp; Loops in Markup</a></li>
@@ -178,7 +186,7 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
       <li><a href="#doc-memo">— Memo, Callback, Memoized</a></li>
       <li><a href="#doc-hook">— Custom Hook</a></li>
       <li><a href="#doc-children">— Children</a></li>
-      <li><a href="#doc-ts">TypeScript Syntax</a></li>
+      <li class="group"><a href="#doc-ts">TypeScript Syntax</a></li>
       <li><a href="#doc-class-fn">— Classes &amp; Functions</a></li>
       <li><a href="#doc-using">— Imports (using)</a></li>
       <li><a href="#doc-records-enums">— Records &amp; Enums</a></li>
@@ -189,12 +197,18 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
       <li><a href="#doc-null">— Optional Chaining &amp; Null-Forgiving</a></li>
       <li><a href="#doc-arrays">— Arrays: Spread, Index, As</a></li>
       <li><a href="#doc-linq">— LINQ</a></li>
+      <li class="group"><a href="#doc-errors">Error Handling</a></li>
+      <li><a href="#doc-err-syntax">— Syntax Errors</a></li>
+      <li><a href="#doc-err-rules">— Semantic Rule Violations</a></li>
+      <li><a href="#doc-err-unsupported">— Unsupported Features</a></li>
+      <li><a href="#doc-err-multi">— Multiple Errors at Once</a></li>
+      <li><a href="#doc-err-internal">— Internal Compiler Errors</a></li>
     </ul>
 
     <a class="top-link" href="#restaurant-app">Restaurant App</a>
     <ul class="sub-list">
-      <li><a href="#restaurant-frontend">Frontend</a></li>
-      <li><a href="#restaurant-backend">Backend</a></li>
+      <li class="group"><a href="#restaurant-frontend">Frontend</a></li>
+      <li class="group"><a href="#restaurant-backend">Backend</a></li>
     </ul>
   </nav>
 
@@ -536,6 +550,121 @@ var info = result[0] as ResultSetHeader;  // type assertion, compile-time only</
       <tr><td><code>Join(inner, ok, ik, result)</code></td><td>a nested <code>.flatMap()</code>/<code>.filter()</code>/<code>.map()</code> — one row per matching pair, like a SQL inner join</td></tr>
     </table>
     <p class="note"><code class="inline">GroupBy</code>/<code class="inline">ToDictionary</code>/<code class="inline">ToLookup</code> aren't implemented — their result is a different shape entirely (a grouped sequence, a Map), not just another array.</p>
+
+    <h3 id="doc-errors">Error Handling</h3>
+    <p>
+      Every error <code class="inline">csx</code> reports is exactly one of three kinds — the kind itself tells
+      you what to do next. Every error includes the exact file, line, and column, plus a short code frame
+      pointing right at the problem.
+    </p>
+    <table>
+      <tr><th>Kind</th><th>Meaning</th><th>What to do</th></tr>
+      <tr><td>Syntax error</td><td>You wrote something invalid — malformed grammar, or a real rule violation like a store action that never mutates state</td><td>Fix your <code class="inline">.csx</code></td></tr>
+      <tr><td>Unsupported feature</td><td>Valid C#, but this compiler doesn't emit it yet</td><td>Not a mistake — restructure around the known gap</td></tr>
+      <tr><td>Internal compiler error</td><td>The compiler itself hit something it didn't expect</td><td>Not your fault — please report it</td></tr>
+    </table>
+
+    <h4 id="doc-err-syntax">Syntax errors — malformed grammar</h4>
+    <p>Something the parser can't make sense of at all — a missing token, a bad tag, an unterminated string.</p>
+    <div class="code-label">Greeting.csx (missing semicolon)</div>
+    <pre><code class="language-csharp">[Component]
+public class Greeting
+{
+    [Prop] private string name
+    public JSX Render() =&gt; &lt;p&gt;Hello, {name}!&lt;/p&gt;;
+}</code></pre>
+    <div class="code-label">Terminal output</div>
+    <pre><code>Greeting.csx:5:5 - syntax error: Expected ";"
+5 |     public JSX Render() =&gt; &lt;p&gt;Hello, {name}!&lt;/p&gt;;
+        ^</code></pre>
+
+    <div class="code-label">Greeting.csx (mismatched JSX closing tag)</div>
+    <pre><code class="language-csharp">[Component]
+public class Greeting
+{
+    [Prop] private string name;
+    public JSX Render() =&gt; &lt;p&gt;Hello, {name}!&lt;/div&gt;;
+}</code></pre>
+    <div class="code-label">Terminal output</div>
+    <pre><code>Greeting.csx:5:50 - syntax error: Mismatched JSX closing tag: expected &lt;/p&gt;, got &lt;/div&gt;
+5 |     public JSX Render() =&gt; &lt;p&gt;Hello, {name}!&lt;/div&gt;;
+                                                     ^</code></pre>
+
+    <h4 id="doc-err-rules">Semantic rule violations</h4>
+    <p>
+      Grammatically fine, but breaks a real rule the compiler enforces — reported as the same "syntax error"
+      kind, since either way the fix is in your <code class="inline">.csx</code>. The one rule checked today: an
+      expression-bodied <code class="inline">[Store]</code> action must actually mutate an
+      <code class="inline">[Observable]</code> property.
+    </p>
+    <div class="code-label">CounterStore.csx (an action that reads state but never changes it)</div>
+    <pre><code class="language-csharp">[Store]
+public class CounterStore
+{
+    [Observable] public int Count { get; set; } = 0;
+    public int Peek() =&gt; Count;
+}</code></pre>
+    <div class="code-label">Terminal output</div>
+    <pre><code>CounterStore.csx:5:5 - syntax error: Store method "Peek" must mutate an [Observable] property
+5 |     public int Peek() =&gt; Count;
+        ^</code></pre>
+
+    <h4 id="doc-err-unsupported">Unsupported features</h4>
+    <p>Real, valid C# — just not emitted yet. Not a mistake to fix, a gap to restructure around.</p>
+    <div class="code-label">Greeting.csx (Render must be expression-bodied — no block body yet)</div>
+    <pre><code class="language-csharp">[Component]
+public class Greeting
+{
+    [Prop] private string name;
+    public JSX Render() { return &lt;p&gt;Hello, {name}!&lt;/p&gt;; }
+}</code></pre>
+    <div class="code-label">Terminal output</div>
+    <pre><code>Greeting.csx:5:25 - unsupported feature: Render() must be expression-bodied (=&gt; JSX); block bodies are not supported for Render yet
+5 |     public JSX Render() { return &lt;p&gt;Hello, {name}!&lt;/p&gt;; }
+                            ^</code></pre>
+
+    <h4 id="doc-err-multi">Multiple errors at once</h4>
+    <p>
+      A mistake in one declaration doesn't hide a mistake in another — every independent problem in a file (and
+      every broken file in a <code class="inline">--dir</code> run) is collected and reported together in one
+      pass, not discovered one fix-and-recompile cycle at a time.
+    </p>
+    <div class="code-label">Dashboard.csx (an unsupported block-bodied [Memo] AND a store rule violation, in the same file)</div>
+    <pre><code class="language-csharp">[Component]
+public class Dashboard
+{
+    [Prop] private string name;
+
+    [Memo(Deps = nameof(name))]
+    private string Shout()
+    {
+        return name;
+    }
+
+    public JSX Render() =&gt; &lt;p&gt;{name}&lt;/p&gt;;
+}
+
+[Store]
+public class CounterStore
+{
+    [Observable] public int Count { get; set; } = 0;
+    public int Peek() =&gt; Count;
+}</code></pre>
+    <div class="code-label">Terminal output — both reported, in one run</div>
+    <pre><code>Dashboard.csx:6:5 - unsupported feature: Block-bodied [Memo] method "Shout" isn't supported yet
+6 |     [Memo(Deps = nameof(name))]
+        ^
+Dashboard.csx:19:5 - syntax error: Store method "Peek" must mutate an [Observable] property
+19 |     public int Peek() =&gt; Count;
+         ^</code></pre>
+
+    <h4 id="doc-err-internal">Internal compiler errors</h4>
+    <p>
+      Looks the same way — file:line:col plus a code frame when a position is available — but means the mistake
+      is on the compiler's side, not yours. There's nothing to fix in your <code class="inline">.csx</code> for
+      one of these; it exists so a raw crash never leaks out disguised as your own bug, and it's always worth
+      reporting.
+    </p>
   </section>
 
   <section id="restaurant-app">
