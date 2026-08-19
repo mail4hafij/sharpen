@@ -177,26 +177,28 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
       <li class="group"><a href="#doc-react">React Syntax</a></li>
       <li><a href="#doc-component">— Component</a></li>
       <li><a href="#doc-state-prop">— State &amp; Props</a></li>
+      <li><a href="#doc-children">— Children</a></li>
       <li><a href="#doc-markup">— Conditionals &amp; Loops in Markup</a></li>
       <li><a href="#doc-fragment">— Fragments</a></li>
-      <li><a href="#doc-store">— Store</a></li>
-      <li><a href="#doc-context">— Context &amp; Provider</a></li>
       <li><a href="#doc-effect">— Effect</a></li>
       <li><a href="#doc-ref">— Ref &amp; ForwardedRef</a></li>
       <li><a href="#doc-memo">— Memo, Callback, Memoized</a></li>
+      <li><a href="#doc-context">— Context &amp; Provider</a></li>
+      <li><a href="#doc-store">— Store</a></li>
       <li><a href="#doc-hook">— Custom Hook</a></li>
-      <li><a href="#doc-children">— Children</a></li>
       <li class="group"><a href="#doc-ts">TypeScript Syntax</a></li>
-      <li><a href="#doc-class-fn">— Classes &amp; Functions</a></li>
+      <li><a href="#doc-types">— Types</a></li>
       <li><a href="#doc-using">— Imports (using)</a></li>
+      <li><a href="#doc-class-fn">— Classes &amp; Functions</a></li>
       <li><a href="#doc-records-enums">— Records &amp; Enums</a></li>
       <li><a href="#doc-control-flow">— Control Flow</a></li>
       <li><a href="#doc-operators">— Operators</a></li>
-      <li><a href="#doc-async">— Async / Await / Try-Catch</a></li>
-      <li><a href="#doc-strings">— Template Literals</a></li>
+      <li><a href="#doc-lambdas">— Lambdas</a></li>
       <li><a href="#doc-null">— Optional Chaining &amp; Null-Forgiving</a></li>
+      <li><a href="#doc-strings">— Template Literals</a></li>
       <li><a href="#doc-arrays">— Arrays: Spread, Index, As</a></li>
       <li><a href="#doc-linq">— LINQ</a></li>
+      <li><a href="#doc-async">— Async / Await / Try-Catch</a></li>
       <li class="group"><a href="#doc-errors">Error Handling</a></li>
       <li><a href="#doc-err-syntax">— Syntax Errors</a></li>
       <li><a href="#doc-err-rules">— Semantic Rule Violations</a></li>
@@ -264,6 +266,16 @@ private void Increment() =&gt; count++;</code></pre>
     <pre><code class="language-typescript">const [count, setCount] = useState&lt;number&gt;(0);
 const increment = () =&gt; setCount(count + 1);</code></pre>
 
+    <h4 id="doc-children">Children — <code>[Prop] private JSX children;</code></h4>
+    <pre><code class="language-csharp">[Prop] private JSX children;
+public JSX Render() =&gt; &lt;div className="panel"&gt;{children}&lt;/div&gt;;</code></pre>
+    <p class="note">
+      <code class="inline">JSX</code> maps to <code class="inline">ReactNode</code>. Lowercase
+      <code class="inline">children</code> is already React's own reserved prop name — React itself,
+      not Sharpen, populates it whenever a parent nests content inside
+      <code class="inline">&lt;YourComponent&gt;...&lt;/YourComponent&gt;</code>.
+    </p>
+
     <h4 id="doc-markup">Conditionals &amp; loops in markup — <code>@if</code> / <code>@foreach</code></h4>
     <div class="code-label">NumberList.csx (excerpt)</div>
     <pre><code class="language-csharp">@if (numbers.Count == 0)
@@ -293,51 +305,6 @@ else
     <div class="code-label">.tsx</div>
     <pre><code class="language-tsx">return (&lt;&gt;&lt;p&gt;Seed: {seed}&lt;/p&gt;&lt;button onClick={increment}&gt;+1&lt;/button&gt;&lt;/&gt;);</code></pre>
 
-    <h4 id="doc-store">Store — <code>[Store]</code>, <code>[Observable]</code>, <code>[Inject]</code></h4>
-    <div class="code-label">CounterStore.csx</div>
-    <pre><code class="language-csharp">[Store]
-public class CounterStore
-{
-    [Observable] public int Count { get; set; } = 0;
-    public void Increment() =&gt; Count++;
-}</code></pre>
-    <div class="code-label">CounterStore.ts</div>
-    <pre><code class="language-typescript">export const useCounterStore = create&lt;{
-    count: number;
-    increment: () =&gt; void;
-}&gt;(set =&gt; ({
-    count: 0,
-    increment: () =&gt; set(s =&gt; ({ count: s.count + 1 })),
-}));</code></pre>
-    <p class="note">
-      Bare <code class="inline">[Inject]</code> subscribes to the whole store (every mutation re-renders).
-      <code class="inline">[Inject(Select = nameof(Store.Member))]</code> subscribes to just one field
-      (<code class="inline">useStore(s =&gt; s.member)</code>) — use this for anything performance-sensitive.
-      A store action can be a real async API call — full statement grammar (locals, <code class="inline">if</code>/<code class="inline">try</code>,
-      <code class="inline">await</code>), not just a bare mutation. See the <a href="#restaurant-frontend">Restaurant App</a> below for a full example.
-    </p>
-
-    <h4 id="doc-context">Context &amp; Provider — <code>[Context]</code>, <code>[UseContext]</code>, dotted JSX tags</h4>
-    <div class="code-label">ThemeContext.csx</div>
-    <pre><code class="language-csharp">[Context]
-public class ThemeContext
-{
-    public string Theme { get; set; } = "light";
-}</code></pre>
-    <div class="code-label">Consuming it</div>
-    <pre><code class="language-csharp">[UseContext] private ThemeContext theme;
-public JSX Render() =&gt; &lt;button className={theme.Theme}&gt;Click me&lt;/button&gt;;</code></pre>
-    <div class="code-label">Providing it — dotted JSX tag names work, e.g. <code>Context.Provider</code></div>
-    <pre><code class="language-csharp">public record ThemeValue(string Theme);
-
-[Prop] private JSX children;
-
-public JSX Render() =&gt;
-    &lt;ThemeContext.Provider value={new ThemeValue("dark")}&gt;
-        {children}
-    &lt;/ThemeContext.Provider&gt;;</code></pre>
-    <p class="note">A dotted tag's root gets the same automatic cross-file import a <code class="inline">[UseContext]</code> field already gets — no explicit import needed even when the context lives in a different file.</p>
-
     <h4 id="doc-effect">Effect — <code>[Effect]</code>, <code>[Effect(Layout = true)]</code></h4>
     <div class="code-label">RenderCounter.csx (excerpt)</div>
     <pre><code class="language-csharp">[Effect(Deps = nameof(value))]
@@ -347,6 +314,8 @@ private void TrackUpdate() =&gt; updateCount++;</code></pre>
     setUpdateCount(updateCount + 1);
 }, [value]);</code></pre>
     <p class="note">
+      More than one dependency works too — <code class="inline">[Effect(Deps = nameof(a), nameof(b))]</code>
+      compiles to <code class="inline">[a, b]</code>, not just the first one.
       <code class="inline">[Effect(Layout = true)]</code> compiles to <code class="inline">useLayoutEffect</code>
       instead of <code class="inline">useEffect</code> — same body/deps handling either way, coexists with
       <code class="inline">Deps</code> on the same attribute. An <code class="inline">async</code> effect
@@ -392,6 +361,52 @@ public JSX Render() =&gt; &lt;p&gt;Total: {Total()}&lt;/p&gt;;</code></pre>
     <div class="code-label">ListSummary.tsx</div>
     <pre><code class="language-tsx">const total = useMemo(() =&gt; numbers.reduce((a, b) =&gt; a + b, 0), [numbers]);
 return (&lt;p&gt;Total: {total}&lt;/p&gt;);</code></pre>
+    <p class="note"><code class="inline">Deps</code> supports more than one dependency here too, the same way <code class="inline">[Effect]</code> does — <code class="inline">Deps = nameof(a), nameof(b)</code> keeps both, not just the first.</p>
+
+    <h4 id="doc-context">Context &amp; Provider — <code>[Context]</code>, <code>[UseContext]</code>, dotted JSX tags</h4>
+    <div class="code-label">ThemeContext.csx</div>
+    <pre><code class="language-csharp">[Context]
+public class ThemeContext
+{
+    public string Theme { get; set; } = "light";
+}</code></pre>
+    <div class="code-label">Consuming it</div>
+    <pre><code class="language-csharp">[UseContext] private ThemeContext theme;
+public JSX Render() =&gt; &lt;button className={theme.Theme}&gt;Click me&lt;/button&gt;;</code></pre>
+    <div class="code-label">Providing it — dotted JSX tag names work, e.g. <code>Context.Provider</code></div>
+    <pre><code class="language-csharp">public record ThemeValue(string Theme);
+
+[Prop] private JSX children;
+
+public JSX Render() =&gt;
+    &lt;ThemeContext.Provider value={new ThemeValue("dark")}&gt;
+        {children}
+    &lt;/ThemeContext.Provider&gt;;</code></pre>
+    <p class="note">A dotted tag's root gets the same automatic cross-file import a <code class="inline">[UseContext]</code> field already gets — no explicit import needed even when the context lives in a different file.</p>
+
+    <h4 id="doc-store">Store — <code>[Store]</code>, <code>[Observable]</code>, <code>[Inject]</code></h4>
+    <div class="code-label">CounterStore.csx</div>
+    <pre><code class="language-csharp">[Store]
+public class CounterStore
+{
+    [Observable] public int Count { get; set; } = 0;
+    public void Increment() =&gt; Count++;
+}</code></pre>
+    <div class="code-label">CounterStore.ts</div>
+    <pre><code class="language-typescript">export const useCounterStore = create&lt;{
+    count: number;
+    increment: () =&gt; void;
+}&gt;(set =&gt; ({
+    count: 0,
+    increment: () =&gt; set(s =&gt; ({ count: s.count + 1 })),
+}));</code></pre>
+    <p class="note">
+      Bare <code class="inline">[Inject]</code> subscribes to the whole store (every mutation re-renders).
+      <code class="inline">[Inject(Select = nameof(Store.Member))]</code> subscribes to just one field
+      (<code class="inline">useStore(s =&gt; s.member)</code>) — use this for anything performance-sensitive.
+      A store action can be a real async API call — full statement grammar (locals, <code class="inline">if</code>/<code class="inline">try</code>,
+      <code class="inline">await</code>), not just a bare mutation. See the <a href="#restaurant-frontend">Restaurant App</a> below for a full example.
+    </p>
 
     <h4 id="doc-hook">Custom hooks — <code>[Hook]</code></h4>
     <div class="code-label">useCounter.csx</div>
@@ -413,18 +428,40 @@ public static CounterHook UseCounter(int initial = 0)
     return { count, increment, reset };
 }</code></pre>
 
-    <h4 id="doc-children">Children — <code>[Prop] private JSX children;</code></h4>
-    <pre><code class="language-csharp">[Prop] private JSX children;
-public JSX Render() =&gt; &lt;div className="panel"&gt;{children}&lt;/div&gt;;</code></pre>
-    <p class="note">
-      <code class="inline">JSX</code> maps to <code class="inline">ReactNode</code>. Lowercase
-      <code class="inline">children</code> is already React's own reserved prop name — React itself,
-      not Sharpen, populates it whenever a parent nests content inside
-      <code class="inline">&lt;YourComponent&gt;...&lt;/YourComponent&gt;</code>.
-    </p>
-
     <h3 id="doc-ts">TypeScript Syntax</h3>
     <p>No React here — plain classes and functions, equally usable in the Node.js backend.</p>
+
+    <h4 id="doc-types">Types</h4>
+    <p>Every C# type this compiler understands, and what it becomes.</p>
+    <table>
+      <tr><th>C#</th><th>TypeScript</th></tr>
+      <tr><td><code>int</code>, <code>double</code>, <code>float</code>, <code>long</code></td><td><code>number</code></td></tr>
+      <tr><td><code>string</code></td><td><code>string</code></td></tr>
+      <tr><td><code>bool</code></td><td><code>boolean</code></td></tr>
+      <tr><td><code>void</code></td><td><code>void</code></td></tr>
+      <tr><td><code>T?</code></td><td><code>T | null</code></td></tr>
+      <tr><td><code>List&lt;T&gt;</code></td><td><code>T[]</code></td></tr>
+      <tr><td><code>Action</code></td><td><code>() =&gt; void</code></td></tr>
+      <tr><td><code>Action&lt;T1, T2, ...&gt;</code></td><td><code>(arg0: T1, arg1: T2, ...) =&gt; void</code></td></tr>
+      <tr><td><code>Task</code></td><td><code>Promise&lt;void&gt;</code></td></tr>
+      <tr><td><code>Task&lt;T&gt;</code></td><td><code>Promise&lt;T&gt;</code></td></tr>
+      <tr><td><code>dynamic</code></td><td><code>any</code></td></tr>
+      <tr><td><code>JSX</code></td><td><code>ReactNode</code></td></tr>
+    </table>
+    <p class="note"><code class="inline">dynamic</code> is for a shape deliberately left unmodeled — e.g. a raw database row from a driver, with no ORM in front of it. <code class="inline">JSX</code> is used for a <code class="inline">[Prop]</code> meant to hold renderable content, most commonly a component's <code class="inline">children</code>.</p>
+
+    <h4 id="doc-using">Imports — <code>using</code></h4>
+    <pre><code class="language-csharp">using { readFileSync } from "fs";
+using path from "path";
+using * as cors from "cors";</code></pre>
+    <pre><code class="language-typescript">import { readFileSync } from "fs";
+import path from "path";
+import * as cors from "cors";</code></pre>
+    <p class="note">
+      A relative-path <code class="inline">using</code> (e.g. <code class="inline">using { Foo } from "./Foo";</code>)
+      is recognized as your own code, so <code class="inline">ClassName.Method()</code> correctly camelCases
+      the member even called by class name. A real package import keeps its casing untouched.
+    </p>
 
     <h4 id="doc-class-fn">Classes &amp; functions</h4>
     <div class="code-label">Rectangle.csx</div>
@@ -444,19 +481,6 @@ public JSX Render() =&gt; &lt;div className="panel"&gt;{children}&lt;/div&gt;;</
 }</code></pre>
     <p>A plain function works the same way: no attribute needed, just a real exported function with real parameters, arithmetic, and local variables.</p>
 
-    <h4 id="doc-using">Imports — <code>using</code></h4>
-    <pre><code class="language-csharp">using { readFileSync } from "fs";
-using path from "path";
-using * as cors from "cors";</code></pre>
-    <pre><code class="language-typescript">import { readFileSync } from "fs";
-import path from "path";
-import * as cors from "cors";</code></pre>
-    <p class="note">
-      A relative-path <code class="inline">using</code> (e.g. <code class="inline">using { Foo } from "./Foo";</code>)
-      is recognized as your own code, so <code class="inline">ClassName.Method()</code> correctly camelCases
-      the member even called by class name. A real package import keeps its casing untouched.
-    </p>
-
     <h4 id="doc-records-enums">Records &amp; enums</h4>
     <div class="code-label">.csx</div>
     <pre><code class="language-csharp">public record Todo(int Id, string Text, bool Done);
@@ -468,9 +492,9 @@ private enum Status { Loading, Success, Error }</code></pre>
     done: boolean;
 }
 type Status = "loading" | "success" | "error";</code></pre>
-    <p><code class="inline">new Todo(1, "Buy milk", false)</code> compiles to a plain object literal <code class="inline">{ id: 1, text: "Buy milk", done: false }</code>; <code class="inline">todo with { Done = true }</code> compiles to <code class="inline">{ ...todo, done: true }</code>.</p>
+    <p><code class="inline">new Todo(1, "Buy milk", false)</code> compiles to a plain object literal <code class="inline">{ id: 1, text: "Buy milk", done: false }</code>; <code class="inline">todo with { Done = true }</code> compiles to <code class="inline">{ ...todo, done: true }</code>. Both a record and an enum work equally well declared top-level (as here) or nested inside a class/component/store/context.</p>
 
-    <h4 id="doc-control-flow">Control flow — <code>if</code>, <code>for</code>, ternary</h4>
+    <h4 id="doc-control-flow">Control flow — <code>if</code>, <code>for</code>, <code>foreach</code>, ternary</h4>
     <div class="code-label">.csx</div>
     <pre><code class="language-csharp">int total = 0;
 for (int i = 0; i &lt; n; i++)
@@ -484,7 +508,16 @@ for (let i: number = 0; i &lt; n; i++) {
     total = total + i;
 }
 return total &gt; 10 ? "big" : "small";</code></pre>
-    <p class="note"><code class="inline">while</code>/<code class="inline">do</code> and a plain <code class="inline">switch</code> aren't supported yet — deferred until something concretely needs them.</p>
+    <div class="code-label">.csx — foreach</div>
+    <pre><code class="language-csharp">foreach (var word in words)
+{
+    console.log(word);
+}</code></pre>
+    <div class="code-label">.ts</div>
+    <pre><code class="language-typescript">for (const word of words) {
+    console.log(word);
+}</code></pre>
+    <p class="note"><code class="inline">foreach</code> compiles to a real <code class="inline">for...of</code>, not <code class="inline">.forEach()</code>. <code class="inline">while</code>/<code class="inline">do</code> and a plain <code class="inline">switch</code> aren't supported yet — deferred until something concretely needs them.</p>
 
     <h4 id="doc-operators">Operators</h4>
     <table>
@@ -498,20 +531,18 @@ return total &gt; 10 ? "big" : "small";</code></pre>
     </table>
     <p class="note"><code class="inline">??</code> sits outermost of the three (loosest), then <code class="inline">||</code>, then <code class="inline">&amp;&amp;</code> — a simplification of real JS's stricter mixing rules, never produces a wrong-precedence result.</p>
 
-    <h4 id="doc-async">Async, await, try/catch</h4>
-    <pre><code class="language-csharp">[Effect(Deps = nameof(userId))]
-private async void LoadUser()
-{
-    try
-    {
-        await fetchUser(userId);
-        status = Status.Success;
-    }
-    catch
-    {
-        status = Status.Error;
-    }
-}</code></pre>
+    <h4 id="doc-lambdas">Lambdas</h4>
+    <div class="code-label">.csx</div>
+    <pre><code class="language-csharp">var doubled = numbers.Select(n =&gt; n * 2);
+var total = doubled.Aggregate(0, (a, b) =&gt; a + b);</code></pre>
+    <div class="code-label">.ts</div>
+    <pre><code class="language-typescript">let doubled = numbers.map(n =&gt; n * 2);
+let total = doubled.reduce((a, b) =&gt; a + b, 0);</code></pre>
+    <p class="note">A single bare parameter needs no parentheses (<code class="inline">n =&gt; ...</code>); more than one does (<code class="inline">(a, b) =&gt; ...</code>). Expression-bodied only — a block-bodied lambda (<code class="inline">() =&gt; { ... }</code>) isn't supported yet.</p>
+
+    <h4 id="doc-null">Optional chaining &amp; null-forgiving</h4>
+    <pre><code class="language-csharp">inputRef.current?.focus();
+someValue!.doSomething();</code></pre>
 
     <h4 id="doc-strings">Template literals — <code>$"..."</code></h4>
     <div class="code-label">.csx</div>
@@ -519,10 +550,6 @@ private async void LoadUser()
     <div class="code-label">.ts</div>
     <pre><code class="language-typescript">let greeting = `Hello, ${name}! You have ${count} item${count === 1 ? "" : "s"}.`;</code></pre>
     <p class="note">C#'s own interpolated-string syntax, not JS's backtick literal directly — stays consistent with "write real C#, get idiomatic TS out." Each <code class="inline">{...}</code> hole is parsed as a fully independent expression (arbitrary nesting works).</p>
-
-    <h4 id="doc-null">Optional chaining &amp; null-forgiving</h4>
-    <pre><code class="language-csharp">inputRef.current?.focus();
-someValue!.doSomething();</code></pre>
 
     <h4 id="doc-arrays">Arrays — spread, indexing, <code>as</code></h4>
     <pre><code class="language-csharp">Categories = [.. Categories, created];   // -&gt; [...categories, created]
@@ -550,6 +577,39 @@ var info = result[0] as ResultSetHeader;  // type assertion, compile-time only</
       <tr><td><code>Join(inner, ok, ik, result)</code></td><td>a nested <code>.flatMap()</code>/<code>.filter()</code>/<code>.map()</code> — one row per matching pair, like a SQL inner join</td></tr>
     </table>
     <p class="note"><code class="inline">GroupBy</code>/<code class="inline">ToDictionary</code>/<code class="inline">ToLookup</code> aren't implemented — their result is a different shape entirely (a grouped sequence, a Map), not just another array.</p>
+
+    <h4 id="doc-async">Async, await, try/catch</h4>
+    <div class="code-label">.csx</div>
+    <pre><code class="language-csharp">[Effect(Deps = nameof(userId))]
+private async void LoadUser()
+{
+    try
+    {
+        await fetchUser(userId);
+        status = Status.Success;
+    }
+    catch
+    {
+        status = Status.Error;
+    }
+}</code></pre>
+    <p>A method can also return a real value asynchronously — <code class="inline">Task</code>/<code class="inline">Task&lt;T&gt;</code> is the real async return type (see <a href="#doc-types">Types</a> above), not <code class="inline">void</code>:</p>
+    <div class="code-label">.csx</div>
+    <pre><code class="language-csharp">public class Repo
+{
+    public static async Task&lt;int&gt; CountRows(string sql)
+    {
+        var result = await Query(sql);
+        return result;
+    }
+}</code></pre>
+    <div class="code-label">.ts</div>
+    <pre><code class="language-typescript">export class Repo {
+    public static async countRows(sql: string): Promise&lt;number&gt; {
+        let result = await Query(sql);
+        return result;
+    }
+}</code></pre>
 
     <h3 id="doc-errors">Error Handling</h3>
     <p>
