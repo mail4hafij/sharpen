@@ -1,15 +1,28 @@
-# Restaurant App — Built with Sharpen
+# Sharpen — Write TypeScript and React Like C#
 
-A small full-stack example — a React frontend and a Node.js/Express/MySQL backend —
-written like C# (`.csx`) and compiled into plain, idiomatic TypeScript by **Sharpen**.
+*Example project: a full-stack Restaurant App (React frontend + Node.js/Express/MySQL backend).*
 
-See [`sharpen.html`](./sharpen.html) for the full idea: what Sharpen is, why you'd
-use it, the complete language reference, and more.
+## What is Sharpen?
 
-## What's in this repo
+Write your frontend and backend in C#-style syntax (`.csx` files). Sharpen compiles it into
+real, plain, idiomatic TypeScript (`.tsx`/`.ts`) that you own outright — nothing downstream
+depends on Sharpen itself: no runtime, no bundler plugin. It's built for teams who already
+think in C# and want that fluency on a brand new TypeScript/React/Node project.
+
+- Not compiled C# — output is plain TypeScript, nothing else runs.
+- Not for existing codebases — new projects only, from day one.
+- Not a runtime or bundler plugin — it just generates TypeScript files; your app never depends on it.
+
+See **[the Sharpen docs](https://mail4hafij.github.io/sharpen/sharpen.html)** for the full
+language reference — every syntax feature with a code snippet, both React and TypeScript.
+
+## About this example
+
+This repo is a real, working app — categories and menu items for a restaurant — showing
+Sharpen used on both ends of a real stack:
 
 - `app/` — the React frontend (Vite + Zustand)
-- `api/` — the Node.js/Express/MySQL backend
+- `api/` — the Node.js/Express/MySQL backend, 8 REST endpoints
 
 Both include the original `.csx` source alongside the compiled `.tsx`/`.ts` files
 that actually run. The Sharpen compiler itself isn't included in this repo — the
@@ -18,21 +31,24 @@ runnable app on its own.
 
 ## Running it
 
+Run both together to use the app for real — the frontend expects the API at
+`http://localhost:4000`.
+
 **Frontend**
 ```bash
 cd app
-npm install
-npm run dev
+npm install     # one-time
+npm run dev     # starts the dev server, prints a URL (e.g. http://localhost:5173)
+npm run build   # type-checks + production build
 ```
-See [`app/README.md`](./app/README.md) for more.
 
-**Backend**
+**Backend** — needs a MySQL database first, see [MySQL setup](#mysql-setup) below.
 ```bash
 cd api
-npm install
-npm run dev
+npm install     # one-time
+npm run dev     # tsx watch - prints "API listening on http://localhost:4000"
+npm run build   # real tsc build to plain .js, then runs it
 ```
-See [`api/README.md`](./api/README.md) for more. Requires a MySQL database — see below.
 
 ## MySQL setup
 
@@ -56,3 +72,30 @@ source, written like C#. It's kept here so you can see what generated
 the TypeScript you're actually running. Since this repo doesn't include the Sharpen
 compiler, the `.csx` files aren't build inputs here — the `.tsx`/`.ts` files are what
 Node/Vite actually use.
+
+## How this demonstrates Sharpen
+
+Every file under `app/src` and `api/src` started as a `.csx` file. A few specific places
+worth opening if you want to see real syntax next to what it compiled to:
+
+**Frontend**
+- `stores/RestaurantStore.csx` — a `[Store]` holding both domain data (categories/items)
+  *and* shared UI state, with real async actions (`await fetch(...)`, real response
+  handling) — see `SaveNewCategory()`.
+- `pages/Category/CategoryList.csx` — narrow `[Inject(Select = ...)]` selectors, so this
+  component only re-renders when the specific store slice it reads actually changes.
+- `pages/Category/CategoryAdd.csx` — `@if` in JSX markup, a modal driven entirely by
+  shared store state instead of local component state.
+
+**Backend**
+- `db/Database.csx` — a static-method namespace (`Database.Connect()`), the pattern every
+  backend class here follows since there are no constructors yet.
+- `categories/CategoryRepository.csx` — real MySQL queries via `pool.query(...)`, and an
+  `as` type assertion on the raw driver result (`result[0] as ResultSetHeader`).
+- `routes/CategoryRoutes.csx` — registering real Express routes, checking the affected-row
+  count before reporting success on Edit/Delete.
+- `main.csx` — the `Main()` entry-point convention: a plain function literally named `Main`
+  is auto-invoked at the bottom of the compiled file.
+
+For what `[Store]`, `[Inject(Select = ...)]`, `@if`, and everything else actually compile
+to, see **[the Sharpen docs](https://mail4hafij.github.io/sharpen/sharpen.html)**.
