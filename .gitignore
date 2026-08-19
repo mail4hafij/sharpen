@@ -1,0 +1,27 @@
+# Dependencies and build output (regenerate with npm install / npm run build)
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# The compiler itself - never uploaded to the public repo
+CSX Compiler/
+
+# Claude Code's local project settings/session data - not for the public repo
+.claude/
+
+# Env files - never commit real credentials
+.env
+.env.local
+.env.*.local
+
+# Editor/OS cruft
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
