@@ -1,8 +1,7 @@
 # Restaurant App — Built with Sharpen
 
 A small full-stack example — a React frontend and a Node.js/Express/MySQL backend —
-written in C#-flavored syntax (`.csx`) and compiled into plain, idiomatic TypeScript
-by **Sharpen**.
+written like C# (`.csx`) and compiled into plain, idiomatic TypeScript by **Sharpen**.
 
 See [`sharpen.html`](./sharpen.html) for the full idea: what Sharpen is, why you'd
 use it, the complete language reference, and more.
@@ -53,7 +52,7 @@ The backend needs a local MySQL server.
 ## About the `.csx` files
 
 Every `.tsx`/`.ts` file has a matching `.csx` file next to it — that's the original
-source, written in C#-flavored syntax. It's kept here so you can see what generated
+source, written like C#. It's kept here so you can see what generated
 the TypeScript you're actually running. Since this repo doesn't include the Sharpen
 compiler, the `.csx` files aren't build inputs here — the `.tsx`/`.ts` files are what
 Node/Vite actually use.
