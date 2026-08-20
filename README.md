@@ -44,9 +44,8 @@ Sharpen used on both ends of a real stack:
 - `api/` — the Node.js/Express/MySQL backend, 8 REST endpoints
 
 Both include the original `.csx` source alongside the compiled `.tsx`/`.ts` files
-that actually run. The Sharpen compiler itself isn't included in this repo — the
-`.csx` files are here for reference, but this repo ships the compiled output as a
-runnable app on its own.
+that actually run. You don't need Sharpen installed to run this app — but if you
+install it, you can recompile any `.csx` file here yourself.
 
 ## Running it
 
@@ -80,17 +79,19 @@ The backend needs a local MySQL server.
    mysql -u root restaurant < api/schema.sql
    ```
 4. By default, the backend connects as `root` with no password on `localhost:3306`
-   (see `api/src/db/Database.ts`). If your setup uses different credentials, edit
-   that file directly — since the compiler isn't part of this repo,
-   `api/src/db/Database.csx` here is reference-only and can't be recompiled from it.
+   (see `api/src/db/Database.ts`). If your setup uses different credentials, either
+   edit `Database.ts` directly, or edit `Database.csx` and recompile it yourself:
+   ```bash
+   sharpen api/src/db/Database.csx -o api/src/db/Database.ts
+   ```
+   (needs Sharpen installed — see [How to Use Sharpen](#how-to-use-sharpen) above).
 
 ## About the `.csx` files
 
-Every `.tsx`/`.ts` file has a matching `.csx` file next to it — that's the original
-source, written like C#. It's kept here so you can see what generated
-the TypeScript you're actually running. Since this repo doesn't include the Sharpen
-compiler, the `.csx` files aren't build inputs here — the `.tsx`/`.ts` files are what
-Node/Vite actually use.
+Every `.tsx`/`.ts` file has a matching `.csx` file next to it — the original source,
+written like C#. The `.tsx`/`.ts` files are what actually run; the `.csx` files are
+kept so you can see what produced them, and you can recompile any of them yourself
+with Sharpen installed (`sharpen Foo.csx -o Foo.tsx`).
 
 ## How this demonstrates Sharpen
 
