@@ -35,7 +35,7 @@ Sharpen reads a `.csx` file once and writes a real `.tsx`/`.ts` file next to it 
 nothing downstream ever touches `.csx` again; the generated file is what you actually
 run, commit, and build.
 
-## About this example
+## The Restaurant App Example
 
 This repo is a real, working app — categories and menu items for a restaurant — showing
 Sharpen used on both ends of a real stack:
