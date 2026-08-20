@@ -172,6 +172,8 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
   <nav class="sidebar">
     <a class="top-link" href="#how-to-run">How to Run</a>
 
+    <a class="top-link" href="#license">License</a>
+
     <a class="top-link" href="#documentation">Documentation</a>
     <ul class="sub-list">
       <li class="group"><a href="#doc-react">React Syntax</a></li>
@@ -225,14 +227,26 @@ const increment = () =&gt; setCount(count + 1);</code></pre>
       to it — nothing downstream ever touches <code class="inline">.csx</code>.
     </p>
 
-    <div class="code-label">Compile a whole project</div>
-    <pre><code class="language-bash">cd "CSX Compiler"
-npm install                          # one-time
-node src/cli.js --dir "../app/src"   # regenerate every .csx under the frontend
-node src/cli.js --dir "../api/src"   # regenerate every .csx under the backend</code></pre>
+    <div class="code-label">Install</div>
+    <pre><code class="language-bash">npm install -g @mail4hafij/sharpen</code></pre>
 
     <div class="code-label">Compile a single file</div>
-    <pre><code class="language-bash">node src/cli.js Foo.csx -o Foo.tsx</code></pre>
+    <pre><code class="language-bash">sharpen Foo.csx -o Foo.tsx</code></pre>
+
+    <div class="code-label">Compile a whole project</div>
+    <pre><code class="language-bash">sharpen --dir ./src</code></pre>
+  </section>
+
+  <section id="license">
+    <div class="section-kicker">Licensing</div>
+    <h2>License</h2>
+    <p>
+      Sharpen is free to use for 30 days from the first time it runs on a given machine.
+      After that, a license is required to keep using it.
+    </p>
+    <p>
+      To request a license, email <a href="mailto:mail4hafij@yahoo.com">mail4hafij@yahoo.com</a>.
+    </p>
   </section>
 
   <section id="documentation">
