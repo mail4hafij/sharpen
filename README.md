@@ -16,6 +16,25 @@ think in C# and want that fluency on a brand new TypeScript/React/Node project.
 See **[the Sharpen docs](https://mail4hafij.github.io/sharpen/sharpen.html)** for the full
 language reference — every syntax feature with a code snippet, both React and TypeScript.
 
+## How to Use Sharpen
+
+Install it globally:
+
+```bash
+npm install -g @mail4hafij/sharpen
+```
+
+Then compile a `.csx` file:
+
+```bash
+sharpen Foo.csx -o Foo.tsx   # a single file
+sharpen --dir ./src          # every .csx file under a folder
+```
+
+Sharpen reads a `.csx` file once and writes a real `.tsx`/`.ts` file next to it —
+nothing downstream ever touches `.csx` again; the generated file is what you actually
+run, commit, and build.
+
 ## About this example
 
 This repo is a real, working app — categories and menu items for a restaurant — showing
