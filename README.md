@@ -35,6 +35,17 @@ Sharpen reads a `.csx` file once and writes a real `.tsx`/`.ts` file next to it 
 nothing downstream ever touches `.csx` again; the generated file is what you actually
 run, commit, and build.
 
+## Editor Support
+
+A VS Code extension adds syntax highlighting for `.csx` files:
+
+```bash
+code --install-extension mail4hafij.sharpen-csx
+```
+
+Or search "Sharpen" in VS Code's Extensions panel. Syntax highlighting only for
+now — no IntelliSense or go-to-definition yet.
+
 ## The Restaurant App Example
 
 This repo is a real, working app — categories and menu items for a restaurant — showing
